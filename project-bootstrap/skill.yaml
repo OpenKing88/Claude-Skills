@@ -1,0 +1,64 @@
+name: project-bootstrap
+description: >
+  Orchestrator skill for bootstrapping new Android projects or modules.
+  Automatically chains the full development pipeline: API generation →
+  network framework → UI tech stack selection → business scenarios.
+  Acts as the conductor that decides which skills to activate in sequence,
+  when to transition between phases, and what each phase must produce
+  before the next can begin.
+
+  This skill is the FIRST skill to activate when the user says anything
+  about starting a new project, building from scratch, setting up a module,
+  or developing a complete feature from API to UI.
+
+version: "1.0.0"
+author: wkj
+
+references:
+  - references/workflows.md
+
+triggers:
+  # 新项目 / 模块启动
+  - 搭建新项目
+  - 开始开发
+  - project bootstrap
+  - 新模块
+  - 项目初始化
+  - 从零开始
+  - start new project
+  - bootstrap project
+  - new module
+  - init project
+  - scaffold project
+  # 全流程开发
+  - 完整开发流程
+  - 全栈开发
+  - full stack development
+  - 从接口到页面
+  - API to UI
+  - end to end development
+  # 阶段跳转
+  - 下一步是什么
+  - what's next
+  - 继续下一阶段
+  - next phase
+  - 接下来做什么
+
+capabilities:
+  # 编排能力
+  - 根据用户意图自动判断当前处于哪个开发阶段
+  - 按顺序激活 Phase 1→2→3→4 的对应技能
+  - 在每个阶段结束时检查产物是否就绪，决定是否过渡到下一阶段
+  - 如果阶段缺失前置条件（如无 Swagger URL），主动向用户询问
+  # 技能路由
+  - Phase 1 API 层：路由到 swagger-to-kotlin（接口 + Bean 生成）
+  - Phase 2 网络框架：检测/搭建 Retrofit + OkHttp 拦截器链
+  - Phase 3 UI 选型：根据项目依赖路由到 android-compose-expert 或 android-viewsystem-foundations
+  - Phase 4 业务场景：根据接口语义路由到 kyc-workflow / order-repay-extension-flow / android-multi-flavor-google / test-case-audit
+  # 过渡条件检查
+  - 每阶段完成后检查产物清单
+  - 验证编译通过后方可进入下一阶段
+  - 缺失依赖时自动向上游回溯
+  # 进度追踪
+  - 输出当前开发进度摘要
+  - 告知用户每个阶段已完成/进行中/待处理的技能

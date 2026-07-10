@@ -1,0 +1,63 @@
+name: kyc-workflow
+description: >
+  KYC (Know Your Customer) workflow business logic for loan applications.
+  This is a project-agnostic skill describing the standard 5-6 step KYC process,
+  field semantics, API patterns, caching strategies, and implementation principles.
+  It does NOT contain project-specific field names, file paths, or UI framework details.
+
+  Key principle: Always read API KDoc comments to understand field semantics,
+  never hardcode field names. Adapt the business logic to your project's
+  specific interface definitions.
+
+  v3.0 新增:
+  - 信用信息步骤标记为可选（由后端配置控制）
+  - 人脸识别三方渠道标记为可选
+  - 拍照/图库选择 + 图片压缩参考代码（含崩溃/ANR风险分析要点）
+  - KYC字段配置策略：硬编码 vs 接口驱动（两种方案可选）
+  - 通用选择弹窗和输入框生成能力
+  - 接口自动扫描与语义匹配能力
+version: "3.0.0"
+author: Claude
+
+# Reference documentation
+references:
+  - references/kyc-workflow.md
+
+# Trigger keywords
+triggers:
+  - kyc
+  - know your customer
+  - 进件流程
+  - 身份认证
+  - 个人信息
+  - 联系人
+  - 身份证认证
+  - 银行卡
+  - 信用信息
+  - 人脸识别
+  - loan application
+  - acq data
+  - submit acq
+  - dict manager
+  - ocr verify
+  - face compare
+  - face channel
+  - 字典系统
+  - 进件缓存
+
+# Capabilities
+capabilities:
+  - 解释 KYC 标准流程的业务逻辑（5 步必选 + 1 步可选）
+  - 说明每个步骤需要收集的信息和字段语义
+  - 解释如何通过接口注释理解字段含义（不硬编码字段名）
+  - 说明字典系统的工作机制（三级缓存、测试模式）和硬编码回退方案
+  - 解释字段配置的两种策略（硬编码 vs 接口驱动）及其适用场景
+  - 解释表单缓存策略（24h TTL、账号隔离、防抖写入）
+  - 说明进件数据提交的通用模式（步骤标识 + 混淆字段）
+  - 解释 OCR 自动回填和确认弹窗机制
+  - 说明人脸识别的渠道适配逻辑（自研必选，三方 SDK 可选 + 降级兜底）
+  - 提供拍照/图库选择 + 图片压缩参考代码，标注 OOM/ANR 风险点
+  - 提供条件展示（级联字段）的实现思路
+  - 提供挽留弹窗和通讯录集成的设计模式
+  - 提供通用选择弹窗和输入框的封装模板
+  - 自动扫描项目 API Service 文件，按语义匹配 KYC 相关接口并提取字段文档
