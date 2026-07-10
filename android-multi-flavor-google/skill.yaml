@@ -1,0 +1,101 @@
+name: android-multi-flavor-google
+description: >
+  Android Gradle multi-flavor (productFlavors) configuration + Google service
+  isolation (Firebase, FCM, Google Play Review) + attribution analysis
+  (Adjust default / AppsFlyer alternative) per flavor channel.
+  v1.3 introduces interactive questioning mode: asks user for production channel
+  name, attribution choice, and dependency version confirmation before generating.
+
+  Use when the user needs to:
+  - Set up multiple environment channels (devTest/preProduct/google)
+  - Isolate Google SDK dependencies per flavor
+  - Separate Google code via sourceSet
+  - Conditionally apply google-services and firebase-crashlytics plugins by task name
+  - Avoid com.google.* bytecode in non-google channels
+  - Integrate attribution analysis (Adjust or AppsFlyer) only in google flavor
+
+version: "1.3.0"
+author: wkj
+
+references:
+  - references/interactive-workflow.md
+  - references/architecture.md
+  - references/traps.md
+  - references/verify.md
+  - references/integration-checklist.md
+
+templates:
+  - templates/libs.versions.toml
+  - templates/build.gradle.kts.root
+  - templates/build.gradle.kts.app
+  - templates/GoogleService.kt
+  - templates/GoogleServices.kt
+  - templates/AttributionService.kt
+  - templates/GoogleServiceImpl.noop.kt
+  - templates/GoogleServiceImpl.real.kt
+  - templates/AdjustAttributionImpl.kt
+  - templates/AppsFlyerAttributionImpl.kt
+  - templates/PushService.kt
+  - templates/AndroidManifest.google.xml
+  - templates/Application.kt
+  - templates/DataStore.kt
+  - templates/proguard-rules.pro
+
+triggers:
+  # Chinese triggers
+  - 多渠道
+  - 渠道隔离
+  - productFlavors
+  - buildVariant
+  - build variant
+  - flavor
+  - Google服务隔离
+  - Firebase按渠道
+  - Adjust集成
+  - AppsFlyer集成
+  - FCM按渠道
+  - googleImplementation
+  - sourceSet隔离
+  - 按渠道打包
+  - 按渠道apply plugin
+  - 按flavor配置依赖
+  - google-services.json隔离
+  - 按渠道apply google plugin
+  - 归因分析
+  - appsflyer
+  - 归因方案
+  - 搭建Google渠道
+  - 配置多渠道
+  # English triggers
+  - flavor dimension
+  - google flavor isolation
+  - conditional google plugin
+  - attribution analysis
+  - Adjust SDK
+  - AppsFlyer SDK
+  - Firebase per flavor
+  - sourceSet isolation
+  - setup google flavor
+  # Mode triggers (verify / troubleshoot)
+  - 验证渠道隔离
+  - 检查配置
+  - verify flavor
+
+capabilities:
+  # Interactive questioning mode
+  - 交互式询问生产渠道名称（默认 google，可自定义，devTest/preProduct 固定不可改）
+  - noGoogle sourceSet 名随正式渠道名强制自动对称同步
+  - 交互式询问归因方案（默认 Adjust，可选 AppsFlyer）
+  - 交互式确认所有依赖版本号
+  # Core setup
+  - 生成完整的三渠道 flavor 矩阵（devTest/preProduct/google）
+  - 生成 AGP 9.x sourceSet 隔离配置（java.srcDirs + kotlin.srcDirs）
+  - 生成条件 apply google-services / firebase-crashlytics plugin 逻辑（含 Gradle property 兜底）
+  - 生成 google flavor 的 Manifest 文件（FCM + 归因 Receiver）
+  - 生成 facade 接口 + 真实实现 + No-Op 实现
+  - 生成 Adjust 或 AppsFlyer 归因实现
+  # Verification
+  - 提供 5 步编译/classpath/APK 验证流程
+  - 提供 Troubleshoot 模式（症状 → 陷阱映射）
+  - 提供归因方案切换检查清单
+  - 提供 9 个实战踩坑陷阱
