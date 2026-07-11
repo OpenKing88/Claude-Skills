@@ -43,9 +43,12 @@ Android ViewSystem 基础知识，覆盖传统 View 体系的开发模式。
 
 ### 4. kyc-workflow
 
-KYC（Know Your Customer）认证工作流业务逻辑，涵盖标准 5-6 步 KYC 流程、字段语义、API 模式、缓存策略和实现原则。
+Android/Kotlin 项目通用 KYC 进件流程技能。
 
-- **注意**: 项目无关 skill，需根据项目具体接口适配
+- **版本**: v4.0.0
+- **模式**: Setup Mode（7问交互式问询 → 逐步骤展示流程 → 适配项目生成代码）+ Verify Mode（6步检查清单审计存量实现）
+- **能力**: 标准5-6步KYC流程、字典三级缓存、表单缓存序列化安全、图片压缩OOM保护、人脸双渠道+降级、银行卡双模式、通用UI组件封装
+- **触发词**: kyc, 进件流程, 身份认证, 人脸识别, 搭建KYC, 验证KYC, verify kyc
 
 ### 5. login-register-flow
 

@@ -1,30 +1,67 @@
 name: kyc-workflow
 description: >
-  KYC (Know Your Customer) workflow business logic for loan applications.
-  This is a project-agnostic skill describing the standard 5-6 step KYC process,
-  field semantics, API patterns, caching strategies, and implementation principles.
-  It does NOT contain project-specific field names, file paths, or UI framework details.
+  Android/Kotlin 项目通用 KYC 进件流程技能。
+  交互式问询模式 (Setup Mode): 7问确认需求 → 逐步骤展示业务流程摘要 → 用户确认 → 适配项目架构生成代码。
+  验证模式 (Verify Mode): 6步检查清单审计存量KYC实现质量，输出 PASS/FAIL/WARN + 修复建议。
 
-  Key principle: Always read API KDoc comments to understand field semantics,
-  never hardcode field names. Adapt the business logic to your project's
-  specific interface definitions.
+  核心原则: 总是先读 API KDoc 注释理解字段语义，不硬编码字段名。
+  业务流程适配项目具体接口定义。
 
-  v3.0 新增:
-  - 信用信息步骤标记为可选（由后端配置控制）
-  - 人脸识别三方渠道标记为可选
-  - 拍照/图库选择 + 图片压缩参考代码（含崩溃/ANR风险分析要点）
-  - KYC字段配置策略：硬编码 vs 接口驱动（两种方案可选）
-  - 通用选择弹窗和输入框生成能力
-  - 接口自动扫描与语义匹配能力
-version: "3.0.0"
+  v4.0 升级:
+  - 新增 SKILL.md 主入口 + 双向模式 (Setup / Verify)
+  - 7问交互式问询: UI框架、步骤范围、字段策略、接口状态、人脸渠道、银行卡模式、人脸模式
+  - 逐步骤生成: 读模板理解业务 → 展示流程摘要 → 用户确认 → 适配项目架构生成代码
+  - 模板定位为教学参考 (业务流程+交互时机), 非占位符替换生成器
+  - 拆分单体文档为 16 个 topic 文件 (步骤级 + 主题级)
+  - 新增 13 个代码模板 (state+viewmodel 合并, 关键交互点 ⚠️ 注释标注)
+  - 新增接口扫描子代理 (agents/kyc-scanner.md)
+  - 新增自动化验证脚本 (scripts/verify-kyc.sh)
+  - 新增故障排查陷阱指南 (references/traps.md)
+  - 新增验证流程文档 (references/verify.md)
+version: "4.0.0"
 author: Claude
 
 # Reference documentation
 references:
-  - references/kyc-workflow.md
+  # 流程步骤 (Step-level)
+  - references/flow-overview.md
+  - references/step-1-personal-info.md
+  - references/step-2-contact-info.md
+  - references/step-3-identity.md
+  - references/step-4-bank-card.md
+  - references/step-5-credit-info.md
+  - references/step-6-face-recognition.md
+  # 通用主题 (Cross-cutting)
+  - references/dictionary-system.md
+  - references/cache-mechanism.md
+  - references/image-processing.md
+  - references/ui-components.md
+  - references/api-patterns.md
+  - references/field-config-strategy.md
+  - references/design-principles.md
+  # 验证与诊断 (Verify & Diagnose)
+  - references/traps.md
+  - references/verify.md
+
+# Templates (教学参考 — 非占位符生成器)
+templates:
+  - templates/base-viewmodel.kt
+  - templates/step-1-personal.kt
+  - templates/step-2-contact.kt
+  - templates/step-3-identity.kt
+  - templates/step-4-bank.kt
+  - templates/step-5-credit.kt
+  - templates/step-6-face.kt
+  - templates/dict-manager.kt
+  - templates/image-compressor.kt
+  - templates/option-select-dialog.kt
+  - templates/confirm-dialog.kt
+  - templates/api-placeholders.kt
+  - templates/cache-model.kt
 
 # Trigger keywords
 triggers:
+  # Setup Mode triggers
   - kyc
   - know your customer
   - 进件流程
@@ -44,20 +81,78 @@ triggers:
   - face channel
   - 字典系统
   - 进件缓存
+  - 搭建KYC
+  - 实现KYC
+  - build kyc
+  - kyc setup
+  - 实现进件
+  # Verify Mode triggers
+  - 验证KYC
+  - 检查进件流程
+  - verify kyc
+  - 审查KYC
+  - KYC审计
+  - 进件流程检查
+  - 验证进件
+  - audit kyc
 
 # Capabilities
 capabilities:
-  - 解释 KYC 标准流程的业务逻辑（5 步必选 + 1 步可选）
+  # ============ Setup Mode ============
+  # Interactive questioning
+  - 7问交互式确认: UI框架(Compose/View/混合)、步骤范围、字段策略(硬编码/接口驱动/混用)、接口状态、人脸渠道、银行卡模式(KYC/外部)、人脸模式(KYC/非KYC)
+  - 问询完毕后输出整体计划摘要 (实现哪些步骤、各自特性、将创建的文件清单)
+  # Per-step generation
+  - 逐步骤执行: 读模板理解业务 → 展示流程摘要(操作序列+接口时序+交互规则) → 用户确认 → 扫描项目架构 → 适配生成代码
+  - 每步流程摘要包含: 用户操作序列、接口调用时机和参数、关键交互规则(挽留弹窗/确认弹窗/级联逻辑/调用顺序)
+  # Project adaptation
+  - 自动扫描项目 API Service 文件, 按语义匹配 KYC 相关接口 (通过 agents/kyc-scanner.md 子代理)
+  - 按项目架构适配生成代码 (复用现有 ViewModel 基类、网络请求封装、导航方式)
+  # Knowledge delivery
+  - 解释 KYC 标准流程的业务逻辑（5 步必选 + 1 步可选: 信用信息）
   - 说明每个步骤需要收集的信息和字段语义
-  - 解释如何通过接口注释理解字段含义（不硬编码字段名）
-  - 说明字典系统的工作机制（三级缓存、测试模式）和硬编码回退方案
-  - 解释字段配置的两种策略（硬编码 vs 接口驱动）及其适用场景
-  - 解释表单缓存策略（24h TTL、账号隔离、防抖写入）
-  - 说明进件数据提交的通用模式（步骤标识 + 混淆字段）
-  - 解释 OCR 自动回填和确认弹窗机制
-  - 说明人脸识别的渠道适配逻辑（自研必选，三方 SDK 可选 + 降级兜底）
-  - 提供拍照/图库选择 + 图片压缩参考代码，标注 OOM/ANR 风险点
-  - 提供条件展示（级联字段）的实现思路
-  - 提供挽留弹窗和通讯录集成的设计模式
-  - 提供通用选择弹窗和输入框的封装模板
-  - 自动扫描项目 API Service 文件，按语义匹配 KYC 相关接口并提取字段文档
+  - 解释如何通过接口 KDoc 注释理解字段含义（不硬编码字段名）
+  - 说明字段配置的两种策略（硬编码 vs 接口驱动）及其适用场景和判断标准
+
+  # ============ Verify Mode ============
+  - 接口存在性检查 (submitAcqData/ocrVerify/faceCompare/acpElementInfo/bankList/dictList/areaList)
+  - 缓存模型安全检查 (字段是否全可空? 是否有 try/catch? 是否按账号隔离?)
+  - 图片处理检查 (ImageCompressor 是否存在? 是否在 Dispatchers.IO 执行? 是否有 Coil/Glide 回显?)
+  - UI组件复用检查 (是否有通用 OptionSelectDialog? 是否存在每字段独立 Dialog 的反模式?)
+  - 挽留弹窗检查 (每个 KYC 步骤是否拦截返回键? 人脸非KYC模式是否跳过了挽留?)
+  - 编译验证 (./gradlew compileDebugKotlin)
+  - 每步输出 PASS/FAIL/WARN + 详细修复建议 (不自动修复)
+
+  # ============ Knowledge Base ============
+  # Core flow
+  - KYC 标准5-6步流程业务语义 (个人信息/联系人/身份证/银行卡/信用信息/人脸识别)
+  - 步骤可选性判断: 信用信息由后端 acpElementInfo 配置控制, 人脸三方渠道可选
+  # Dictionary & Cache
+  - 字典系统三级缓存策略 (内存 ConcurrentHashMap → 本地 DataStore 24h TTL → 网络接口) + 测试模式 + 硬编码回退方案
+  - 表单缓存机制 (24h TTL + 账号隔离 + 防抖写入 + onPause flush)
+  - 缓存序列化安全: 所有字段必须可空 + 默认值 null + 防御式 try/catch 读写
+  # Image
+  - 图片处理规范: 两步解码(bounds+ByteArray) + 内存预算校验 + 质量循环 + 降分辨率兜底
+  - 图片压缩必须在 Dispatchers.IO 执行, 失败返回 null 不抛异常
+  - 图片回显使用 Coil/Glide 加载 URI, 禁止 BitmapFactory.decode 原图
+  - 拍照和图库选择统一封装 (项目中只存在一套图片获取逻辑)
+  # Face
+  - 人脸渠道适配: 自研 CameraX 兜底 + Face++ 三方 SDK 可选 + 自动降级机制
+  - Face++ 流程: getToken → FaceSdkTools.startFaceTanCheck → CompletableDeferred(60s timeout) → faceCompare
+  - 降级条件: Token 为空/超时/SDK errToYc 回调/用户取消
+  # Bank & Face dual mode
+  - 银行卡双模式: KYC步骤模式(submitAcqData t3e8L=4 + 缓存) vs 外部添加模式(submitBankCard + popBackStack)
+  - 人脸非KYC模式: isKyc=false → 跳过挽留弹窗 + 结果通过 savedStateHandle 回传
+  # UI
+  - 通用选择弹窗: 单一 OptionSelectDialog 服务所有字典字段, 禁止 EducationDialog/MaritalDialog 等
+  - 通用确认弹窗: 只读表单 + 确认/修改双按钮 + canceledOnTouchOutside=false
+  - 通用挽留弹窗: 每个步骤拦截返回键, 降低用户流失
+  - 控件封装原则: 与业务解耦、与样式解耦、统一接口
+  # API & Config
+  - 进件数据提交通用模式 (步骤标识 t3e8L=1-6) + 字段命名原则 (混淆字段 + KDoc 语义)
+  - 接口自动扫描与语义匹配: submit/ocr/face/bank/dict/area/element/progress 10类识别规则
+  - 9类接口占位代码 (后端未就绪时使用, 保证流程代码可编译)
+  - 字段配置双策略 (方案A硬编码 vs 方案B接口驱动) 对比 + 混用推荐 + 判断标准
+  # Design
+  - 21条关键设计原则 + 29项实现检查清单
+  - 10-12条常见陷阱 (症状→诊断→修复映射表)
