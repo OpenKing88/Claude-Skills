@@ -61,10 +61,11 @@ Phase 1 完成，或项目已有 API 接口但缺少网络层。
    - OkHttp 客户端是否配置（拦截器链）
    - 响应包装类是否就绪（ApiBaseResponseBean）
    - BaseUrl 配置方式（BuildConfig / 动态域名）
-2. 缺失则按以下模板搭建：
-   - OkHttpClient：请求头拦截器 + AES 加密/解密 + 动态域名 + 日志
-   - Retrofit：GsonConverterFactory + BaseUrl + 超时配置
-   - 协程适配：suspend 函数 + try/catch 统一异常处理
+2. 缺失则激活 **android-project-template** 技能的 **Inject Mode**：
+   - 自动检测当前网络层状态，生成缺失的 OkHttpClient/Retrofit/拦截器
+   - 同步检查 BaseViewModel/BaseActivity/BaseApplication 是否缺失，一并补全
+   - 确保输出满足本 Phase 的产物清单
+   - 具体实现参考 android-project-template 的 SKILL.md 和 templates/
 3. 验证网络层可调用（至少一个编译通过的接口）
 ```
 

@@ -337,28 +337,32 @@ $APKANALYZER dex packages app/build/outputs/apk/devTestDebug/*.apk \
 | `Extension of type 'AppExtension' does not exist` | 第三方 plugin 不兼容 AGP 9 | 陷阱 5 |
 | `Adjust.getGoogleAdId` 返回 null | 缺少 `play-services-ads-identifier` 依赖 | 陷阱 8 |
 
-## 测试签名文件创建
+## 签名凭据配置
 
-渠道隔离搭建完成后，为 devTest / preProduct 创建测试签名：
+渠道隔离使用双签名方案（测试签名 + 正式签名），凭据通过 `secret()` 从 `gradle.properties` 读取，不硬编码在 build 文件中。
 
-```bash
-keytool -genkeypair -v \
-  -keystore app/test-debug.jks \
-  -alias testdebug \
-  -keyalg RSA -keysize 2048 \
-  -validity 10000 \
-  -storepass android \
-  -keypass android \
-  -dname "CN=Test Debug, OU=Dev, O=Test, L=Lima, ST=Lima, C=PE"
+在项目根目录或用户全局的 `gradle.properties`（`~/.gradle/gradle.properties`）中配置：
+
+```properties
+# ==================== 签名凭据 ====================
+# 测试/验证签名（devTest / preProduct）
+TEST_STORE_FILE=../keystore/test-release.jks
+TEST_STORE_PASSWORD=***
+TEST_KEY_ALIAS=***
+TEST_KEY_PASSWORD=***
+
+# 正式上架签名（google）
+GOOGLE_STORE_FILE=../keystore/production.jks
+GOOGLE_STORE_PASSWORD=***
+GOOGLE_KEY_ALIAS=***
+GOOGLE_KEY_PASSWORD=***
 ```
 
-| 参数 | 值 | 说明 |
-|------|-----|------|
-| 文件路径 | `app/test-debug.jks` | 与 `release.jks` 同级 |
-| alias | `testdebug` | 测试签名别名 |
-| 密码 | `android` | store 和 key 密码相同 |
-| 密钥算法 | RSA 2048 | 与正式签名一致 |
-| 有效期 | 10000 天 | 约 27 年 |
-| 签发者 | CN=Test Debug, C=PE | 便于与正式签名区分 |
+| 参数 | 说明 |
+|------|------|
+| `*_STORE_FILE` | 密钥库文件路径，相对于 `app/` 模块目录 |
+| `*_STORE_PASSWORD` | 密钥库密码 |
+| `*_KEY_ALIAS` | 密钥别名 |
+| `*_KEY_PASSWORD` | 密钥密码 |
 
-> 此签名仅用于 devTest / preProduct 内部测试，**绝不用于 Google Play 上架**。建议将 `app/test-debug.jks` 加入 `.gitignore`。
+> 建议将密钥库文件放在 `app/` 外部（如 `../keystore/`），将所有 `*.jks` 和 `*.keystore` 加入 `.gitignore`，避免误提交。**正式签名凭据绝不入 git**，仅在 CI 环境变量或本地 `gradle.properties` 中配置。

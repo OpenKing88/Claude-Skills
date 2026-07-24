@@ -136,6 +136,7 @@ answers:
 | `{{FlavorName}}` | `{{flavorName}}` 首字母大写 | `Google` |
 | `{{noFlavorName}}` | `no` + `{{FlavorName}}` | `noGoogle` |
 | `{{flavorNameUpper}}` | `{{flavorName}}` 全大写 | `GOOGLE` |
+| `{{flavorName}}Release` | `{{flavorName}}` + `Release`（signingConfig 名） | `googleRelease` |
 | `{{adjustToken}}` | Adjust App Token（让用户提供或标记 TODO） | `your-adjust-token` |
 | `{{appsFlyerDevKey}}` | AppsFlyer Dev Key（让用户提供或标记 TODO） | `your-appsflyer-key` |
 | `{{loggerImport}}` | 默认 `import android.util.Log` | `import android.util.Log` |
@@ -174,5 +175,6 @@ AI 必须输出汇总信息：
 文件生成后，告知用户需要手动完成以下操作：
 1. 从 Firebase Console 下载 `google-services.json` → 放入 `src/{{flavorName}}/` 目录
 2. 替换 `{{adjustToken}}` 或 `{{appsFlyerDevKey}}` 为真实 SDK key
-3. 运行 `./gradlew :app:assemble{{FlavorName}}Release` 验证构建通过
-4. 将 `app/test-debug.jks` 添加至 `.gitignore`
+3. 在 `gradle.properties` 中配置 `TEST_*` 和 `GOOGLE_*` 签名凭据（参考 `references/verify.md`）
+4. 将所有 `*.jks` 和 `*.keystore` 加入 `.gitignore`，确保签名凭据不入 git
+5. 运行 `./gradlew :app:assemble{{FlavorName}}Release` 验证构建通过

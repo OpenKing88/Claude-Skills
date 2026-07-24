@@ -22,14 +22,14 @@
 
 ## Variant 矩阵
 
-| Variant            | signing | minify | shrinkResources | ENABLE_LOG | sourceSet 隔离  |
-|--------------------|---------|--------|-----------------|------------|---------------|
-| devTestDebug       | release | false  | false           | true       | `noGoogle/`   |
-| devTestRelease     | release | true   | true            | false      | `noGoogle/`   |
-| preProductRelease  | release | true   | true            | false      | `noGoogle/`   |
-| googleRelease      | release | true   | true            | false      | `google/`     |
+| Variant            | signing         | minify | shrinkResources | ENABLE_LOG | sourceSet 隔离  |
+|--------------------|-----------------|--------|-----------------|------------|---------------|
+| devTestDebug       | testRelease     | false  | false           | true       | `noGoogle/`   |
+| devTestRelease     | testRelease     | true   | true            | false      | `noGoogle/`   |
+| preProductRelease  | testRelease     | true   | true            | false      | `noGoogle/`   |
+| googleRelease      | googleRelease   | true   | true            | false      | `google/`     |
 
-> **devTestDebug 用正式签名但不混淆**:保留断点调试和符号信息。日常开发跑 devTestDebug 不会被 R8 拖慢。
+> **devTestDebug 用测试签名但不混淆**:保留断点调试和符号信息。日常开发跑 devTestDebug 不会被 R8 拖慢。签名凭据通过 `secret()` 从 `gradle.properties` 读取，不硬编码在 build 文件中。
 
 ## sourceSet 隔离布局
 
@@ -92,9 +92,7 @@ interface AttributionService {
 ├── settings.gradle.kts                       ← 不动
 ├── gradle/libs.versions.toml                 ← Google alias 段
 └── app/
-    ├── build.gradle.kts                      ← flavor + sourceSet + 条件 apply + googleImplementation
-    ├── release.jks                           ← 正式签名（手动管理）
-    ├── test-debug.jks                        ← 测试签名（keytool 自动生成，供 devTest/preProduct 使用）
+    ├── build.gradle.kts                      ← flavor + sourceSet + 条件 apply + googleImplementation + signing
     ├── proguard-rules.pro
     └── src/
         ├── main/
@@ -177,7 +175,7 @@ preProduct 是 devTest 到 google 之间的一道「安全检查门」,确保在
 ## 附录：常用命令速查
 
 ```bash
-# 日常开发联调(测试域名 + 日志开 + 不混淆 + 不含 Google)
+# 日常开发联调(测试域名 + 日志开 + 不混淆 + 不含 Google + 测试签名)
 ./gradlew :app:assembleDevTestDebug
 
 # 测试环境验证混淆/签名
@@ -202,3 +200,4 @@ preProduct 是 devTest 到 google 之间的一道「安全检查门」,确保在
 | v1.1 | 命名规范 | 新增 `<AppPrefix>` 文件前缀规范，所有 Google facade 接口与实现文件统一使用项目简称驼峰前缀，避免多模块同名冲突。 |
 | v1.2 | 归因抽象 | 新增 `AttributionService` 接口，将归因逻辑与 `GoogleService` 解耦；支持 Adjust(默认)与 AppsFlyer(备选)双方案；归因数据统一写入 DataStore `attributionDataKey`；配套 ProGuard 规则与版本目录依赖。 |
 | v1.3 | 文档重构 | 交互式询问模式（渠道命名→归因方案→版本确认）；单体 SKILL.md 拆分为 skill.yaml + SKILL.md(dispatcher, ~100行) + 5 references + 16 templates；新增 Setup/Verify/Troubleshoot 三模式系统；占位符统一为 {{mustache}} 风格；模板代码修复 12 项（通知去重/Firebase ProGuard/Adjust 废弃 API 等）。 |
+| v1.4 | 签名升级 | 双签名方案：`signingConfigs` 拆为 `testRelease` + `{{flavorName}}Release`；凭据通过 `secret()` 从 `gradle.properties` 读取而非硬编码；签名按 flavor 在 `beforeVariants` 中分发；移除 `test-debug.jks` keytool 生成步骤。 |
